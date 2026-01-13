@@ -31,6 +31,10 @@
         }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; }
+        
+        /* Modal 動畫 */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 200ms, transform 200ms; }
     </style>
 </head>
 <body class="select-none md:select-auto">
@@ -97,11 +101,13 @@
             WifiOff: (p) => <IconBase {...p}><line x1="1" x2="23" y1="1" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></IconBase>,
             Wifi: (p) => <IconBase {...p}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></IconBase>,
             Flag: (p) => <IconBase {...p}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></IconBase>,
-            RefreshCw: (p) => <IconBase {...p}><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></IconBase>,
-            FileText: (p) => <IconBase {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></IconBase>
+            Plane: (p) => <IconBase {...p}><path d="M2 12h5"/><path d="M13 12h3"/><path d="M9.74 2.74 2 12h5l2.74-9.26a1 1 0 1 1 1.9 0.6Z"/><path d="M9.74 21.26 2 12h5l2.74 9.26a1 1 0 1 0 1.9-0.6Z"/><path d="M20 12h2"/></IconBase>,
+            Edit: (p) => <IconBase {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></IconBase>,
+            X: (p) => <IconBase {...p}><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></IconBase>,
+            Copy: (p) => <IconBase {...p}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></IconBase>
         };
 
-        const { Home, Briefcase, MapIcon, DollarSign, Sun, Calculator, CheckSquare, Square, Plus, Trash, Utensils, Bed, Bus, Wallet, MapPin, Grip, Loader, Share, Users, WifiOff, Wifi, Flag, RefreshCw, FileText } = Icons;
+        const { Home, Briefcase, MapIcon, DollarSign, Sun, Calculator, CheckSquare, Square, Plus, Trash, Utensils, Bed, Bus, Wallet, MapPin, Grip, Loader, Share, Users, WifiOff, Wifi, Flag, Plane, Edit, X, Copy } = Icons;
         const { useState, useEffect, useMemo, useRef } = React;
 
         const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -118,12 +124,12 @@
             travelers: ["我"],
             info: { 
                 weatherCity: "東京", 
-                travelMonth: "1", // 🟢 新增月份
-                weatherTemp: "5°C - 10°C", // 🟢 新增溫度 (自動帶入用)
+                travelMonth: "1", 
+                weatherTemp: "5°C - 10°C", 
                 weatherNote: "早晚溫差大", 
                 currencyRate: 0.21, 
                 currencyCode: "JPY", 
-                noteCards: [ // 🟢 改為卡片陣列
+                noteCards: [
                     { id: 'default1', title: '航班資訊', content: '去程: BR198 08:50\n回程: BR197 14:00' }
                 ]
             },
@@ -144,10 +150,10 @@
             meal: { label: '餐飲', icon: Utensils, color: 'bg-[#EED8C8] text-[#9C6849]' },
             accommodation: { label: '住宿', icon: Bed, color: 'bg-[#D2D2E0] text-[#5D5D78]' },
             transport: { label: '交通', icon: Bus, color: 'bg-[#C3D9D1] text-[#4F7066]' },
+            flight: { label: '航班', icon: Plane, color: 'bg-[#D0E0E3] text-[#5A7D82]' },
             other: { label: '其他', icon: Wallet, color: 'bg-[#E0E0E0] text-[#757575]' }
         };
 
-        // 🟢 簡易的城市月均溫模擬資料 (因為無法直接串接歷史天氣 API)
         const MOCK_WEATHER_DATA = {
             "東京": ["5°C-10°C", "6°C-11°C", "9°C-14°C", "14°C-19°C", "18°C-23°C", "21°C-26°C", "25°C-29°C", "26°C-31°C", "23°C-27°C", "18°C-22°C", "12°C-17°C", "8°C-12°C"],
             "大阪": ["6°C-10°C", "6°C-11°C", "9°C-14°C", "15°C-20°C", "20°C-25°C", "23°C-28°C", "27°C-32°C", "28°C-33°C", "24°C-29°C", "18°C-23°C", "13°C-17°C", "8°C-12°C"],
@@ -157,24 +163,55 @@
             "倫敦": ["2°C-8°C", "2°C-9°C", "4°C-12°C", "6°C-15°C", "9°C-18°C", "12°C-21°C", "14°C-23°C", "14°C-23°C", "11°C-20°C", "9°C-16°C", "5°C-11°C", "3°C-9°C"]
         };
 
+        // --- 🟢 通用對話框元件 (解決 prompt/alert 被封鎖問題) ---
+        const Modal = ({ isOpen, onClose, title, children, showConfirm, onConfirm, confirmText = "確定", showCancel = true }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all relative z-10 animate-[modal-enter_0.2s_ease-out]">
+                        <div className="bg-[#F4F8F7] p-4 flex justify-between items-center border-b border-[#E0E0E0]">
+                            <h3 className="font-bold text-[#5A7D82]">{title}</h3>
+                            <button onClick={onClose} className="text-[#9DAAB0] hover:text-[#A67575]"><X size={20}/></button>
+                        </div>
+                        <div className="p-4">
+                            {children}
+                        </div>
+                        {(showConfirm || showCancel) && (
+                            <div className="p-4 bg-[#F9F9F7] flex justify-end gap-2">
+                                {showCancel && <button onClick={onClose} className="px-4 py-2 rounded-lg text-[#586666] hover:bg-[#E0E0E0] text-sm">取消</button>}
+                                {showConfirm && <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-[#84A59D] text-white hover:bg-[#6B8E8E] text-sm font-bold shadow-sm">{confirmText}</button>}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 🟢 簡易提示框 (Toast) ---
+        const Toast = ({ msg, show }) => {
+            if (!show) return null;
+            return (
+                <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-[#4A5D5E] text-white px-4 py-2 rounded-full shadow-lg text-sm z-[60] flex items-center gap-2 animate-bounce">
+                    <CheckSquare size={16}/> {msg}
+                </div>
+            );
+        };
+
         // --- 子元件 ---
-        const InfoTab = ({ data, updateData }) => {
+        const InfoTab = ({ data, updateData, showModal }) => { // Pass showModal
             const [amount, setAmount] = useState(1000);
             const [rateLoading, setRateLoading] = useState(false);
             
-            // 🟢 自動更新天氣
             const updateWeather = (city, monthStr) => {
                 const month = parseInt(monthStr);
                 if (!city || !month) return;
                 
-                // 嘗試尋找模擬資料
                 let temp = "";
-                // 模糊比對
                 const cityKey = Object.keys(MOCK_WEATHER_DATA).find(k => city.includes(k));
                 if (cityKey) {
                     temp = MOCK_WEATHER_DATA[cityKey][month - 1];
                 } else {
-                    // 如果找不到，根據月份給個大致範圍 (北半球邏輯)
                     if (month >= 6 && month <= 8) temp = "25°C - 30°C (預估)";
                     else if (month >= 12 || month <= 2) temp = "5°C - 12°C (預估)";
                     else temp = "15°C - 22°C (預估)";
@@ -182,7 +219,6 @@
                 updateData('info', { ...data.info, weatherCity: city, travelMonth: monthStr, weatherTemp: temp });
             };
 
-            // 🟢 自動更新匯率
             const fetchRate = async (code) => {
                 if(!code || code.length !== 3) return;
                 setRateLoading(true);
@@ -200,14 +236,19 @@
                 }
             };
 
-            // 🟢 筆記操作
-            const addNote = () => {
-                const title = prompt("請輸入筆記標題 (例如: 購物清單)", "新筆記");
-                if(!title) return;
-                const newCard = { id: generateId(), title, content: "" };
-                // 確保 noteCards 存在
-                const currentCards = data.info.noteCards || [];
-                updateData('info', { ...data.info, noteCards: [...currentCards, newCard] });
+            const handleAddNote = () => {
+                showModal({
+                    type: 'input',
+                    title: '新增筆記',
+                    message: '請輸入筆記標題 (例如: 購物清單)',
+                    defaultValue: '新筆記',
+                    onConfirm: (val) => {
+                        if(!val) return;
+                        const newCard = { id: generateId(), title: val, content: "" };
+                        const currentCards = data.info.noteCards || [];
+                        updateData('info', { ...data.info, noteCards: [...currentCards, newCard] });
+                    }
+                });
             };
 
             const updateNoteContent = (id, newContent) => {
@@ -216,16 +257,21 @@
                 updateData('info', { ...data.info, noteCards: newCards });
             };
 
-            const deleteNote = (id) => {
-                if(!confirm("確定刪除此筆記？")) return;
-                const currentCards = data.info.noteCards || [];
-                const newCards = currentCards.filter(c => c.id !== id);
-                updateData('info', { ...data.info, noteCards: newCards });
+            const handleDeleteNote = (id) => {
+                showModal({
+                    type: 'confirm',
+                    title: '刪除筆記',
+                    message: '確定要刪除這張筆記卡片嗎？',
+                    onConfirm: () => {
+                        const currentCards = data.info.noteCards || [];
+                        const newCards = currentCards.filter(c => c.id !== id);
+                        updateData('info', { ...data.info, noteCards: newCards });
+                    }
+                });
             };
 
             return (
                 <div className="space-y-4 p-4 pb-24">
-                    {/* 天氣卡片 */}
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-[#F2E6D8]">
                         <h3 className="flex items-center gap-2 text-[#9C7A60] font-bold mb-3"><Sun size={20}/> 天氣概況</h3>
                         <div className="flex gap-2 mb-2 items-center">
@@ -248,7 +294,6 @@
                             value={data.info.weatherNote} onChange={e => updateData('info', { ...data.info, weatherNote: e.target.value })} placeholder="天氣備註" />
                     </div>
 
-                    {/* 匯率卡片 */}
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-[#DCE5E8]">
                         <h3 className="flex items-center gap-2 text-[#6B8594] font-bold mb-3"><Calculator size={20}/> 匯率試算</h3>
                         <div className="flex items-center gap-2 mb-4 bg-[#F4F7F8] p-2 rounded-lg text-[#58707E]">
@@ -279,11 +324,10 @@
                         </div>
                     </div>
 
-                    {/* 行程筆記 (卡片式) */}
                     <div>
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="text-[#6D5D50] font-bold">行程筆記</h3>
-                            <button onClick={addNote} className="text-xs bg-[#EBE1D0] text-[#8C7654] px-3 py-1.5 rounded-full hover:bg-[#E0D4C0] flex items-center gap-1">
+                            <button onClick={handleAddNote} className="text-xs bg-[#EBE1D0] text-[#8C7654] px-3 py-1.5 rounded-full hover:bg-[#E0D4C0] flex items-center gap-1">
                                 <Plus size={14}/> 新增筆記
                             </button>
                         </div>
@@ -298,7 +342,7 @@
                                                 updateData('info', { ...data.info, noteCards: newCards });
                                             }}
                                         />
-                                        <button onClick={() => deleteNote(card.id)} className="text-[#D1D1D1] hover:text-[#A67575] p-1"><Trash size={16}/></button>
+                                        <button onClick={() => handleDeleteNote(card.id)} className="text-[#D1D1D1] hover:text-[#A67575] p-1"><Trash size={16}/></button>
                                     </div>
                                     <textarea 
                                         className="w-full resize-none outline-none text-[#586666] leading-relaxed placeholder-[#D0C0B0] text-sm min-h-[100px] bg-transparent" 
@@ -380,7 +424,7 @@
             );
         };
 
-        const ItineraryTab = ({ data, updateData, activeDayIdx, setActiveDayIdx }) => {
+        const ItineraryTab = ({ data, updateData, activeDayIdx, setActiveDayIdx, showModal }) => { // Pass showModal
             const dragItem = useRef(null);
             const dragOverItem = useRef(null);
             const [editingItem, setEditingItem] = useState(null);
@@ -393,14 +437,21 @@
                 if (idx !== -1) { day.items[idx] = { ...day.items[idx], ...updates }; updateData('days', newDays); }
             };
             const handleDeleteItem = (itemId) => {
-                if(!confirm("確定刪除此項目？")) return;
-                const newDays = [...data.days];
-                newDays[activeDayIdx].items = newDays[activeDayIdx].items.filter(i => i.id !== itemId);
-                updateData('days', newDays);
+                showModal({
+                    type: 'confirm',
+                    title: '刪除項目',
+                    message: '確定要刪除此行程項目嗎？',
+                    onConfirm: () => {
+                        const newDays = [...data.days];
+                        newDays[activeDayIdx].items = newDays[activeDayIdx].items.filter(i => i.id !== itemId);
+                        updateData('days', newDays);
+                        setEditingItem(null); // Close editing
+                    }
+                });
             };
             const handleAddItem = (type) => {
                 const newDays = [...data.days];
-                newDays[activeDayIdx].items.push({ id: generateId(), type, name: '', cost: 0, isShared: true, sharedAmount: 0, payer: data.travelers[0] || '我', location: '', note: '' });
+                newDays[activeDayIdx].items.push({ id: generateId(), type, name: '', cost: 0, budget: 0, isShared: true, sharedAmount: 0, payer: data.travelers[0] || '我', location: '', note: '' });
                 updateData('days', newDays);
             };
             const onDragSort = () => {
@@ -415,54 +466,126 @@
                 dragOverItem.current = null;
             };
 
+            const handleDayDateChange = (e) => {
+                const newDate = e.target.value;
+                const newDays = [...data.days];
+                newDays[activeDayIdx].date = newDate;
+                const currentDayId = newDays[activeDayIdx].id;
+                newDays.sort((a, b) => new Date(a.date) - new Date(b.date));
+                const newIndex = newDays.findIndex(d => d.id === currentDayId);
+                if (newIndex !== -1) setActiveDayIdx(newIndex);
+                updateData('days', newDays);
+            };
+
             const renderTypeFields = (item) => {
                 const commonInputClass = "w-full p-2 rounded border border-[#E0E0E0] text-[#586666] text-sm";
                 const commonLabelClass = "text-xs text-[#9DAAB0] block mb-1";
-                
-                switch(item.type) {
-                    case 'transport':
-                        return (
-                            <>
-                                <div className="col-span-2"><label className={commonLabelClass}>交通方式/班次</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="例如: 高鐵 0802車次" /></div>
-                                <div><label className={commonLabelClass}>出發地</label><input type="text" className={commonInputClass} value={item.origin} onChange={e=>handleUpdateItem(item.id, {origin: e.target.value})} placeholder="起點" /></div>
-                                <div><label className={commonLabelClass}>目的地</label><input type="text" className={commonInputClass} value={item.destination} onChange={e=>handleUpdateItem(item.id, {destination: e.target.value})} placeholder="訖點" /></div>
-                                <div className="col-span-2"><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="備註事項" /></div>
-                            </>
-                        );
-                    case 'accommodation':
-                        return (
-                            <>
-                                <div className="col-span-2"><label className={commonLabelClass}>旅館名稱</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="旅館名稱" /></div>
-                                <div className="col-span-2"><label className={commonLabelClass}>地址</label><input type="text" className={commonInputClass} value={item.location} onChange={e=>handleUpdateItem(item.id, {location: e.target.value})} placeholder="旅館地址" /></div>
-                                <div><label className={commonLabelClass}>交通方式</label><input type="text" className={commonInputClass} value={item.transportMethod} onChange={e=>handleUpdateItem(item.id, {transportMethod: e.target.value})} placeholder="如何抵達" /></div>
-                                <div><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="入住時間/訂單號" /></div>
-                            </>
-                        );
-                    case 'attraction':
-                    case 'activity':
-                    case 'meal':
-                        return (
-                            <>
-                                <div className="col-span-2"><label className={commonLabelClass}>名稱</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="名稱" /></div>
-                                <div><label className={commonLabelClass}>營業/活動時間</label><input type="text" className={commonInputClass} value={item.time} onChange={e=>handleUpdateItem(item.id, {time: e.target.value})} placeholder="時間" /></div>
-                                <div><label className={commonLabelClass}>地點</label><input type="text" className={commonInputClass} value={item.location} onChange={e=>handleUpdateItem(item.id, {location: e.target.value})} placeholder="地點" /></div>
-                                <div className="col-span-2"><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="備註" /></div>
-                            </>
-                        );
-                    default:
-                         return (
-                            <>
-                                <div className="col-span-2"><label className={commonLabelClass}>項目名稱</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="名稱" /></div>
-                                <div className="col-span-2"><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="備註" /></div>
-                            </>
-                        );
-                }
+                const currentPayer = data.travelers.includes(item.payer) ? item.payer : data.travelers[0];
+
+                const CostBudgetBlock = () => (
+                    <div className="bg-white p-3 rounded border border-[#E0E0E0] mb-3">
+                        <div className="flex gap-3 mb-3">
+                            <div className="flex-1">
+                                <label className="text-xs text-[#9DAAB0] block mb-1">預算</label>
+                                <div className="relative">
+                                    <span className="absolute left-2 top-2 text-[#AAA]">$</span>
+                                    <input type="number" className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666]" value={item.budget || 0} onChange={e => handleUpdateItem(item.id, { budget: Number(e.target.value) })} />
+                                </div>
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-xs text-[#9DAAB0] block mb-1">實際支出</label>
+                                <div className="relative">
+                                    <span className="absolute left-2 top-2 text-[#AAA]">$</span>
+                                    <input type="number" className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666]" 
+                                        value={item.cost} 
+                                        onChange={e => { 
+                                            const val = Number(e.target.value); 
+                                            const updates = { cost: val }; 
+                                            if(item.isShared && item.sharedAmount == item.cost) { updates.sharedAmount = val; } 
+                                            handleUpdateItem(item.id, updates); 
+                                        }} 
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="text-xs text-[#9DAAB0] block mb-1">先墊付人</label>
+                            <select className="w-full p-2 rounded bg-[#F9F9F7] text-[#586666]" value={currentPayer} onChange={e=>handleUpdateItem(item.id, {payer: e.target.value})}>
+                                {data.travelers.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="flex items-center justify-between pt-2 border-t border-[#F0F0F0]">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" className="w-4 h-4 text-[#84A59D] rounded accent-[#84A59D]" checked={item.isShared} onChange={e => handleUpdateItem(item.id, { isShared: e.target.checked, sharedAmount: e.target.checked ? item.cost : 0 })} />
+                                <span className="text-sm font-medium text-[#777]">納入公費分帳</span>
+                            </label>
+                            {item.isShared && (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-[#9DAAB0]">公費金額:</span>
+                                    <input type="number" className="w-20 p-1 text-right border-b border-[#84A59D] text-[#5A7D82] font-bold outline-none" value={item.sharedAmount !== undefined ? item.sharedAmount : item.cost} onChange={e => handleUpdateItem(item.id, { sharedAmount: Number(e.target.value) })} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+
+                const fields = (() => {
+                    switch(item.type) {
+                        case 'transport':
+                        case 'flight':
+                            return (
+                                <>
+                                    <div className="col-span-2"><label className={commonLabelClass}>{item.type==='flight'?'航班號':'交通方式/班次'}</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder={item.type==='flight'?'例如: BR198':'例如: 高鐵 0802車次'} /></div>
+                                    <div><label className={commonLabelClass}>出發地</label><input type="text" className={commonInputClass} value={item.origin} onChange={e=>handleUpdateItem(item.id, {origin: e.target.value})} placeholder="起點" /></div>
+                                    <div><label className={commonLabelClass}>目的地</label><input type="text" className={commonInputClass} value={item.destination} onChange={e=>handleUpdateItem(item.id, {destination: e.target.value})} placeholder="訖點" /></div>
+                                    <div className="col-span-2"><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="備註事項" /></div>
+                                </>
+                            );
+                        case 'accommodation':
+                            return (
+                                <>
+                                    <div className="col-span-2"><label className={commonLabelClass}>旅館名稱</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="旅館名稱" /></div>
+                                    <div className="col-span-2"><label className={commonLabelClass}>地址</label><input type="text" className={commonInputClass} value={item.location} onChange={e=>handleUpdateItem(item.id, {location: e.target.value})} placeholder="旅館地址" /></div>
+                                    <div><label className={commonLabelClass}>交通方式</label><input type="text" className={commonInputClass} value={item.transportMethod} onChange={e=>handleUpdateItem(item.id, {transportMethod: e.target.value})} placeholder="如何抵達" /></div>
+                                    <div><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="入住時間/訂單號" /></div>
+                                </>
+                            );
+                        case 'attraction':
+                        case 'activity':
+                        case 'meal':
+                            return (
+                                <>
+                                    <div className="col-span-2"><label className={commonLabelClass}>名稱</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="名稱" /></div>
+                                    <div><label className={commonLabelClass}>營業/活動時間</label><input type="text" className={commonInputClass} value={item.time} onChange={e=>handleUpdateItem(item.id, {time: e.target.value})} placeholder="時間" /></div>
+                                    <div><label className={commonLabelClass}>地點</label><input type="text" className={commonInputClass} value={item.location} onChange={e=>handleUpdateItem(item.id, {location: e.target.value})} placeholder="地點" /></div>
+                                    <div className="col-span-2"><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="備註" /></div>
+                                </>
+                            );
+                        default:
+                            return (
+                                <>
+                                    <div className="col-span-2"><label className={commonLabelClass}>項目名稱</label><input type="text" className={commonInputClass} value={item.name} onChange={e=>handleUpdateItem(item.id, {name: e.target.value})} placeholder="名稱" /></div>
+                                    <div className="col-span-2"><label className={commonLabelClass}>備註</label><input type="text" className={commonInputClass} value={item.note} onChange={e=>handleUpdateItem(item.id, {note: e.target.value})} placeholder="備註" /></div>
+                                </>
+                            );
+                    }
+                })();
+
+                return (
+                    <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            {fields}
+                        </div>
+                        <CostBudgetBlock /> 
+                    </div>
+                );
             };
 
             const renderCardContent = (item) => {
                 const subTextClass = "text-xs text-[#9DAAB0] truncate mr-2";
                 switch(item.type) {
                     case 'transport':
+                    case 'flight':
                         return (
                             <div className="flex flex-wrap">
                                 {item.origin && item.destination && <span className={subTextClass}>{item.origin} ➝ {item.destination}</span>}
@@ -508,21 +631,35 @@
                     </div>
                     
                     <div className="p-4 space-y-3 pb-32">
+                        {/* 單日日期編輯區 */}
+                        <div className="flex items-center gap-2 mb-2 bg-white p-3 rounded-xl border border-[#F0F0F0] shadow-sm">
+                            <span className="text-sm font-bold text-[#5A7D82] whitespace-nowrap">Day {activeDayIdx + 1} 日期：</span>
+                            <input 
+                                type="date" 
+                                className="bg-transparent text-[#586666] outline-none border-b border-[#E0E0E0] focus:border-[#84A59D] w-full text-sm font-mono"
+                                value={currentDay.date}
+                                onChange={handleDayDateChange}
+                            />
+                        </div>
+
                         {currentDay.items.map((item, index) => {
                             const isEditing = editingItem === item.id;
-                            const TypeIcon = ITEM_TYPES[item.type].icon;
+                            const typeConfig = ITEM_TYPES[item.type] || ITEM_TYPES.other;
+                            const TypeIcon = typeConfig.icon;
                             const displaySharedAmount = item.sharedAmount !== undefined ? item.sharedAmount : item.cost;
+                            
                             return (
                                 <div key={item.id} draggable={!isEditing} onDragStart={() => dragItem.current = index} onDragEnter={() => dragOverItem.current = index} onDragEnd={onDragSort} onDragOver={e => e.preventDefault()} className={`bg-white rounded-xl shadow-sm border border-[#F0F0F0] overflow-hidden transition-all ${isEditing ? 'ring-2 ring-[#84A59D]' : ''}`}>
                                     {!isEditing ? (
                                         <div className="flex items-center p-3 gap-3" onClick={() => setEditingItem(item.id)}>
                                             <div className="cursor-move text-[#D1D1D1]"><Grip size={16}/></div>
-                                            <div className={`p-2 rounded-lg ${ITEM_TYPES[item.type].color}`}><TypeIcon size={18}/></div>
+                                            <div className={`p-2 rounded-lg ${typeConfig.color}`}><TypeIcon size={18}/></div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="font-bold text-[#586666] truncate">{item.name || "未命名項目"}</div>
                                                 {renderCardContent(item)}
                                                 <div className="text-xs text-[#9DAAB0] flex gap-2 mt-1">
-                                                    {item.cost > 0 && <span className="bg-[#F4F4F4] px-1 rounded text-[#777]">${item.cost}</span>}
+                                                    {item.budget > 0 && <span className="bg-[#F0F0F0] px-1 rounded text-[#999]">預 ${item.budget}</span>}
+                                                    {item.cost > 0 && <span className="bg-[#F4F4F4] px-1 rounded text-[#777]">實 ${item.cost}</span>}
                                                     {item.payer && <span className="bg-[#EBE1D0] bg-opacity-40 px-1 rounded text-[#8C7654]">{item.payer}</span>}
                                                 </div>
                                             </div>
@@ -533,27 +670,13 @@
                                     ) : (
                                         <div className="p-4 bg-[#F9F9F7]">
                                             <div className="flex justify-between items-center mb-3 pb-2 border-b border-[#E0E0E0]"><span className="text-xs font-bold text-[#AAA] uppercase">編輯項目</span><div className="flex gap-2"><button onClick={()=>handleDeleteItem(item.id)} className="text-[#A67575] p-1"><Trash size={16}/></button><button onClick={()=>setEditingItem(null)} className="text-[#5A7D82] font-bold px-3 py-1 bg-[#D0E0E3] rounded text-sm">完成</button></div></div>
-                                            <div className="space-y-3">
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    {renderTypeFields(item)}
-                                                </div>
-                                                <div className="bg-white p-3 rounded border border-[#E0E0E0]">
-                                                    <div className="flex gap-3 mb-3">
-                                                        <div className="flex-1"><label className="text-xs text-[#9DAAB0] block mb-1">總金額</label><div className="relative"><span className="absolute left-2 top-2 text-[#AAA]">$</span><input type="number" className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666]" value={item.cost} onChange={e => { const val = Number(e.target.value); const updates = { cost: val }; if(item.isShared && item.sharedAmount == item.cost) { updates.sharedAmount = val; } handleUpdateItem(item.id, updates); }} /></div></div>
-                                                        <div className="flex-1"><label className="text-xs text-[#9DAAB0] block mb-1">先墊付人</label><select className="w-full p-2 rounded bg-[#F9F9F7] text-[#586666]" value={item.payer} onChange={e=>handleUpdateItem(item.id, {payer: e.target.value})}>{data.travelers.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between pt-2 border-t border-[#F0F0F0]">
-                                                        <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" className="w-4 h-4 text-[#84A59D] rounded accent-[#84A59D]" checked={item.isShared} onChange={e => handleUpdateItem(item.id, { isShared: e.target.checked, sharedAmount: e.target.checked ? item.cost : 0 })} /><span className="text-sm font-medium text-[#777]">納入公費分帳</span></label>
-                                                        {item.isShared && (<div className="flex items-center gap-2"><span className="text-xs text-[#9DAAB0]">公費金額:</span><input type="number" className="w-20 p-1 text-right border-b border-[#84A59D] text-[#5A7D82] font-bold outline-none" value={displaySharedAmount} onChange={e => handleUpdateItem(item.id, { sharedAmount: Number(e.target.value) })} /></div>)}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            {renderTypeFields(item)}
                                         </div>
                                     )}
                                 </div>
                             );
                         })}
-                        <div className="grid grid-cols-6 gap-2 pt-2">{Object.entries(ITEM_TYPES).map(([type, config]) => { const Icon = config.icon; return <button key={type} onClick={() => handleAddItem(type)} className="flex flex-col items-center justify-center p-2 rounded-lg bg-white border border-[#EEE] active:scale-95 transition-transform hover:bg-[#F9F9F7]"><div className={`p-2 rounded-full mb-1 ${config.color}`}><Icon size={18} /></div><span className="text-[10px] text-[#888] truncate">{config.label}</span></button>})}</div>
+                        <div className="grid grid-cols-6 gap-2 pt-2">{Object.entries(ITEM_TYPES).filter(([type]) => type !== 'flight').map(([type, config]) => { const Icon = config.icon; return <button key={type} onClick={() => handleAddItem(type)} className="flex flex-col items-center justify-center p-2 rounded-lg bg-white border border-[#EEE] active:scale-95 transition-transform hover:bg-[#F9F9F7]"><div className={`p-2 rounded-full mb-1 ${config.color}`}><Icon size={18} /></div><span className="text-[10px] text-[#888] truncate">{config.label}</span></button>})}</div>
                     </div>
                 </div>
             );
@@ -562,56 +685,146 @@
         const ExpensesTab = ({ data }) => {
             const summary = useMemo(() => {
                 const balances = {}; 
-                data.travelers.forEach(t => balances[t] = { paid: 0, share: 0, diff: 0 });
+                const travelerList = data.travelers || [];
+                const personalPrivateSpend = {}; 
+
+                travelerList.forEach(t => {
+                    balances[t] = { paidForPublic: 0, paidTotal: 0, shouldPay: 0, diff: 0 };
+                    personalPrivateSpend[t] = 0;
+                });
+                
                 let totalPublicExpense = 0;
-                const allItems = data.days.flatMap(d => d.items).filter(i => i.cost > 0);
-                const sharedPaidByPerson = {};
-                data.travelers.forEach(t => sharedPaidByPerson[t] = 0);
+                let totalPublicBudget = 0;
+                
+                const allItems = data.days.flatMap(d => d.items).filter(i => i.cost > 0 || i.budget > 0);
                 
                 allItems.forEach(item => {
-                    if (balances[item.payer]) { balances[item.payer].paid += item.cost; }
+                    const payer = travelerList.includes(item.payer) ? item.payer : travelerList[0];
+                    const cost = Number(item.cost) || 0;
+                    const budget = Number(item.budget) || 0;
+
                     if (item.isShared) {
-                        const sharedAmt = item.sharedAmount !== undefined ? item.sharedAmount : item.cost;
+                        totalPublicBudget += budget; 
+                        const sharedAmt = item.sharedAmount !== undefined ? item.sharedAmount : cost;
                         totalPublicExpense += sharedAmt;
-                        if (sharedPaidByPerson[item.payer] !== undefined) { sharedPaidByPerson[item.payer] += sharedAmt; }
+                        if (balances[payer]) {
+                            balances[payer].paidForPublic += sharedAmt;
+                            balances[payer].paidTotal += cost; 
+                        }
+                    } else {
+                        if (balances[payer]) {
+                            balances[payer].paidTotal += cost;
+                        }
+                        if (personalPrivateSpend[payer] !== undefined) {
+                            personalPrivateSpend[payer] += cost;
+                        }
                     }
                 });
 
-                const perPersonShare = totalPublicExpense / (data.travelers.length || 1);
-                data.travelers.forEach(t => { balances[t].diff = sharedPaidByPerson[t] - perPersonShare; });
+                const perPersonShare = totalPublicExpense / (travelerList.length || 1);
+
+                travelerList.forEach(t => {
+                    balances[t].shouldPay = perPersonShare;
+                    balances[t].diff = balances[t].paidForPublic - perPersonShare; 
+                });
+
                 const itemsByPayer = {};
-                data.travelers.forEach(t => itemsByPayer[t] = []);
-                allItems.forEach(item => { if(itemsByPayer[item.payer]) itemsByPayer[item.payer].push(item); });
-                return { totalPublicExpense, perPersonShare, balances, itemsByPayer, sharedPaidByPerson };
+                travelerList.forEach(t => itemsByPayer[t] = []);
+                allItems.forEach(item => { 
+                    const payer = travelerList.includes(item.payer) ? item.payer : travelerList[0];
+                    if(itemsByPayer[payer]) itemsByPayer[payer].push(item); 
+                });
+
+                return { totalPublicExpense, totalPublicBudget, perPersonShare, balances, personalPrivateSpend, itemsByPayer };
             }, [data]);
+
+            const budgetPercent = summary.totalPublicBudget > 0 
+                ? Math.min((summary.totalPublicExpense / summary.totalPublicBudget) * 100, 100) 
+                : 0;
 
             return (
                 <div className="p-4 pb-24 space-y-6">
-                    <div className="bg-gradient-to-br from-[#84A59D] to-[#6B8E8E] rounded-2xl p-6 text-white shadow-lg shadow-[#84A59D]/20">
-                        <div className="text-center">
-                            <h2 className="text-[#E0EBE9] text-sm font-medium mb-1">公費總支出</h2>
-                            <div className="text-4xl font-bold tracking-tight">${summary.totalPublicExpense.toLocaleString()}</div>
-                            <div className="mt-2 inline-block bg-white/20 px-3 py-1 rounded-full text-xs">每人應付 <span className="font-bold">${Math.round(summary.perPersonShare).toLocaleString()}</span></div>
+                    {/* 置頂公費 Bar */}
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#F0F0F0]">
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <h2 className="text-[#586666] font-bold text-lg">公費概況</h2>
+                                <span className="text-xs text-[#9DAAB0]">總預算 ${summary.totalPublicBudget.toLocaleString()}</span>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-[#84A59D]">${summary.totalPublicExpense.toLocaleString()}</div>
+                                <span className="text-xs text-[#9DAAB0]">實際支出</span>
+                            </div>
+                        </div>
+                        <div className="w-full bg-[#F0F0F0] rounded-full h-3 overflow-hidden">
+                            <div 
+                                className={`h-full rounded-full transition-all duration-500 ${summary.totalPublicExpense > summary.totalPublicBudget ? 'bg-[#A67575]' : 'bg-[#84A59D]'}`} 
+                                style={{ width: `${budgetPercent}%` }}
+                            ></div>
+                        </div>
+                        <div className="mt-2 text-center">
+                             <span className="inline-block bg-[#F4F8F7] px-3 py-1 rounded-full text-xs text-[#5A7D82]">
+                                每人應分攤公費 <span className="font-bold">${Math.round(summary.perPersonShare).toLocaleString()}</span>
+                            </span>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm border border-[#F0F0F0] p-4">
-                        <h3 className="font-bold text-[#586666] mb-3 border-l-4 border-[#84A59D] pl-2">結算建議</h3>
-                        <div className="space-y-3">
-                            {data.travelers.map(t => {
-                                const diff = Math.round(summary.balances[t].diff);
-                                return (
-                                    <div key={t} className="flex justify-between items-center py-1 border-b border-[#F9F9F7] last:border-0">
-                                        <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-[#F4F8F7] flex items-center justify-center text-xs font-bold text-[#5A7D82]">{t[0]}</div><span className="font-medium text-[#586666]">{t}</span></div>
-                                        <div className="text-right">{diff > 0 ? (<span className="text-[#84A59D] font-bold">應收 ${diff.toLocaleString()}</span>) : diff < 0 ? (<span className="text-[#A67575] font-bold">應付 ${Math.abs(diff).toLocaleString()}</span>) : (<span className="text-[#B0B0B0]">平</span>)}<div className="text-[10px] text-[#B0B0B0]">代墊公費 ${summary.sharedPaidByPerson[t].toLocaleString()}</div></div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                    
+                    {/* 🟢 個人財務卡片 (合併版) */}
                     <div className="space-y-4">
+                        {data.travelers.map(t => {
+                            const publicShare = Math.round(summary.perPersonShare);
+                            const privateSpend = Math.round(summary.personalPrivateSpend[t] || 0);
+                            const totalCost = publicShare + privateSpend;
+                            const info = summary.balances[t] || { paidForPublic: 0, shouldPay: 0, diff: 0 };
+                            const diff = Math.round(info.diff);
+
+                            return (
+                                <div key={t} className="bg-white rounded-xl shadow-sm border border-[#F0F0F0] p-4">
+                                    <div className="flex items-center gap-2 mb-3 border-b border-[#F9F9F7] pb-2">
+                                        <div className="w-8 h-8 rounded-full bg-[#F4F8F7] flex items-center justify-center text-xs font-bold text-[#5A7D82]">{t[0]}</div>
+                                        <span className="font-bold text-[#586666] text-lg">{t}</span>
+                                    </div>
+                                    
+                                    <div className="mb-3">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <h4 className="text-sm font-bold text-[#6B8E8E]">個人總支出</h4>
+                                            <span className="font-bold text-[#586666] text-lg">${totalCost.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px] text-[#9DAAB0] bg-[#FDFBF7] p-2 rounded">
+                                            <span>應付公費: ${publicShare.toLocaleString()}</span>
+                                            <span>+</span>
+                                            <span>個人私費: ${privateSpend.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <h4 className="text-sm font-bold text-[#84A59D]">公費結算建議</h4>
+                                            <div className="text-right">
+                                                {diff > 0 ? (
+                                                    <span className="text-[#84A59D] font-bold">應收 ${diff.toLocaleString()}</span>
+                                                ) : diff < 0 ? (
+                                                    <span className="text-[#A67575] font-bold">應付 ${Math.abs(diff).toLocaleString()}</span>
+                                                ) : (
+                                                    <span className="text-[#B0B0B0]">平</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="text-right text-[10px] text-[#9DAAB0]">
+                                            已代墊公費: ${Math.round(info.paidForPublic).toLocaleString()}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-[#F0F0F0]">
+                        <h3 className="text-sm font-bold text-[#9DAAB0] pl-1">詳細支付紀錄</h3>
                         {data.travelers.map(payer => {
                             const items = summary.itemsByPayer[payer];
                             if(!items || items.length === 0) return null;
+                            const totalPaid = summary.balances[payer]?.paidTotal || 0;
                             return (
                                 <div key={payer} className="bg-white rounded-xl shadow-sm border border-[#F0F0F0] overflow-hidden">
                                     <div className="bg-[#F9F9F7] p-3 flex justify-between items-center"><span className="font-bold text-[#586666]">{payer} 的支付紀錄</span><span className="text-xs bg-[#E0E0E0] px-2 py-1 rounded text-[#777]">共 {items.length} 筆</span></div>
@@ -625,7 +838,9 @@
                                                 </div>
                                             );
                                         })}
-                                        <div className="p-2 bg-[#FDFBF7] text-right text-xs text-[#9DAAB0]">總計代墊: ${summary.balances[payer].paid.toLocaleString()}</div>
+                                        <div className="p-2 bg-[#FDFBF7] text-right text-xs text-[#9DAAB0]">
+                                            個人代墊總額 (含私費): <span className="font-bold text-[#586666]">${totalPaid.toLocaleString()}</span>
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -642,7 +857,18 @@
             const [activeTab, setActiveTab] = useState("itinerary");
             const [activeDayIdx, setActiveDayIdx] = useState(0);
             const [syncState, setSyncState] = useState(isOnline ? 'connecting' : 'offline'); 
+            // 🟢 新增 Modal State
+            const [modal, setModal] = useState({ isOpen: false, type: 'input', title: '', message: '', defaultValue: '', onConfirm: null });
 
+            // 🟢 Helper to show modal
+            const showModal = (config) => {
+                setModal({ isOpen: true, ...config });
+            };
+            const closeModal = () => {
+                setModal(prev => ({ ...prev, isOpen: false }));
+            };
+
+            // ... (rest of effects: ID init, Firebase, AutoSave)
             useEffect(() => {
                 let tId = "";
                 try {
@@ -696,33 +922,162 @@
 
             const updateData = (key, value) => setTripData(prev => ({ ...prev, [key]: value }));
             
+            // 🟢 替換原生功能 - 分享
             const shareLink = () => {
-                try {
-                    navigator.clipboard.writeText(window.location.href).then(() => alert("已複製連結")).catch(()=>prompt("請手動複製", window.location.href));
-                } catch(e) { prompt("請手動複製", window.location.href); }
+                const url = window.location.href;
+                // 嘗試寫入 Clipboard (若支援)
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        // Show simple toast or modal
+                        showModal({ type: 'alert', title: '已複製連結', message: '連結已複製到剪貼簿，傳送給旅伴即可同步編輯！', showCancel: false });
+                    }).catch(() => {
+                        // Fallback
+                        showModal({ type: 'input', title: '手動複製連結', message: '請複製下方連結傳送給旅伴：', defaultValue: url, showCancel: false });
+                    });
+                } else {
+                    // Fallback for older browsers / strict sandbox
+                    const textArea = document.createElement("textarea");
+                    textArea.value = url;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showModal({ type: 'alert', title: '已複製連結', message: '連結已複製到剪貼簿！', showCancel: false });
+                    } catch (err) {
+                        showModal({ type: 'input', title: '手動複製連結', message: '請複製下方連結傳送給旅伴：', defaultValue: url, showCancel: false });
+                    }
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            // 🟢 替換原生功能 - 切換 Trip
+            const switchTrip = () => {
+                showModal({
+                    type: 'input',
+                    title: '切換行程',
+                    message: '請輸入新的行程 ID (英數字) 以切換或建立新行程：',
+                    defaultValue: tripId,
+                    onConfirm: (newId) => {
+                        if (newId && newId !== tripId) {
+                            const safeId = newId.trim().replace(/[^a-zA-Z0-9\-_]/g, '');
+                            if (safeId) {
+                                try {
+                                    const url = new URL(window.location.href);
+                                    url.searchParams.set('tripId', safeId);
+                                    window.location.href = url.toString();
+                                } catch (e) {
+                                    showModal({ type: 'input', title: '手動切換', message: '請複製新網址：', defaultValue: window.location.pathname + '?tripId=' + safeId, showCancel: false });
+                                }
+                            } else {
+                                showModal({ type: 'alert', title: '格式錯誤', message: 'ID 只能包含英數字、底線或減號', showCancel: false });
+                            }
+                        }
+                    }
+                });
+            };
+
+            // 🟢 替換原生功能 - 編輯標題
+            const editTitle = () => {
+                showModal({
+                    type: 'input',
+                    title: '修改標題',
+                    defaultValue: tripData.title,
+                    onConfirm: (val) => val && updateData('title', val)
+                });
+            };
+
+            // 🟢 替換原生功能 - 編輯旅伴
+            const editTravelers = () => {
+                showModal({
+                    type: 'input',
+                    title: '修改旅伴名單',
+                    message: '請輸入旅伴姓名 (用逗號分隔)：',
+                    defaultValue: tripData.travelers.join(','),
+                    onConfirm: (val) => {
+                        if(val) updateData('travelers', val.split(/[,，]/).map(s=>s.trim()).filter(s=>s));
+                    }
+                });
+            };
+
+            const handleStartDateChange = (newStartDate) => {
+                if (!newStartDate) return;
+                const newDays = tripData.days.map((day, index) => ({ ...day, date: addDays(newStartDate, index) }));
+                setTripData(prev => ({ ...prev, startDate: newStartDate, days: newDays }));
+            };
+
+            // 🟢 Modal 內部組件渲染邏輯
+            const ModalContent = () => {
+                const [inputVal, setInputVal] = useState(modal.defaultValue || '');
+                useEffect(() => setInputVal(modal.defaultValue || ''), [modal.isOpen, modal.defaultValue]);
+
+                return (
+                    <Modal 
+                        isOpen={modal.isOpen} 
+                        onClose={closeModal} 
+                        title={modal.title} 
+                        showConfirm={modal.type !== 'alert'} // Alert only shows "Close" (handled by x) or we can make custom
+                        showCancel={modal.type !== 'alert'}
+                        onConfirm={() => {
+                            if (modal.onConfirm) modal.onConfirm(modal.type === 'input' ? inputVal : undefined);
+                            closeModal();
+                        }}
+                    >
+                        {modal.message && <p className="text-sm text-[#586666] mb-3">{modal.message}</p>}
+                        {modal.type === 'input' && (
+                            <input 
+                                type="text" 
+                                className="w-full border border-[#E0E0E0] rounded p-2 text-[#586666] focus:border-[#84A59D] outline-none" 
+                                value={inputVal} 
+                                onChange={e => setInputVal(e.target.value)} 
+                                autoFocus
+                            />
+                        )}
+                        {modal.type === 'alert' && <div className="flex justify-end"><button onClick={closeModal} className="px-4 py-2 bg-[#84A59D] text-white rounded text-sm">關閉</button></div>}
+                    </Modal>
+                );
             };
 
             return (
                 <div className="max-w-md mx-auto min-h-screen bg-[#FDFBF7] flex flex-col relative shadow-2xl shadow-[#DCE5E8]/30">
+                    <ModalContent />
+                    
                     <header className="bg-white px-4 py-3 shadow-sm sticky top-0 z-20 flex justify-between items-center border-b border-[#F0F0F0]">
                         <div className="flex flex-col">
-                            <h1 className="font-bold text-lg text-[#5A7D82] flex items-center gap-2">{tripData.title}<span className="text-[10px] bg-[#D0E0E3] text-[#5A7D82] px-1.5 py-0.5 rounded font-mono">ID: {tripId}</span></h1>
+                            <h1 className="font-bold text-lg text-[#5A7D82] flex items-center gap-2">
+                                <span onClick={editTitle} className="cursor-pointer hover:underline decoration-dashed decoration-[#84A59D] underline-offset-4">{tripData.title}</span>
+                                <span 
+                                    onClick={switchTrip}
+                                    className="text-[10px] bg-[#D0E0E3] text-[#5A7D82] px-1.5 py-0.5 rounded font-mono cursor-pointer hover:bg-[#BCCCD1]"
+                                    title="點擊切換或建立新行程"
+                                >
+                                    ID: {tripId} ✎
+                                </span>
+                            </h1>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-[#9DAAB0]">{tripData.startDate} 出發</span>
+                                <label className="flex items-center gap-1 cursor-pointer hover:bg-[#F9F9F7] px-1 rounded transition-colors">
+                                    <input 
+                                        type="date" 
+                                        value={tripData.startDate} 
+                                        onChange={(e) => handleStartDateChange(e.target.value)}
+                                        className="text-xs text-[#9DAAB0] bg-transparent outline-none w-[80px] cursor-pointer"
+                                    />
+                                    <span className="text-xs text-[#9DAAB0]">出發 &middot; {tripData.days.length} 天</span>
+                                </label>
+
                                 {syncState === 'synced' && <span className="text-[10px] text-[#84A59D] flex items-center"><Wifi size={10} className="mr-1"/>已同步</span>}
                                 {syncState === 'connecting' && <span className="text-[10px] text-[#EBE1D0] flex items-center"><Loader size={10} className="mr-1 animate-spin"/>同步中</span>}
                                 {(syncState === 'offline' || syncState === 'error') && <span className="text-[10px] text-[#D1D1D1] flex items-center"><WifiOff size={10} className="mr-1"/>離線模式</span>}
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={() => { const newTitle = prompt("修改標題", tripData.title); if(newTitle) updateData('title', newTitle); const newTravelers = prompt("修改旅伴 (用逗號分隔)", tripData.travelers.join(',')); if(newTravelers) updateData('travelers', newTravelers.split(',').map(s=>s.trim()).filter(s=>s)); }} className="p-2 bg-[#F9F9F7] rounded-full text-[#9DAAB0] hover:bg-[#F4F8F7] hover:text-[#5A7D82]"><Users size={18}/></button>
+                            <button onClick={editTravelers} className="p-2 bg-[#F9F9F7] rounded-full text-[#9DAAB0] hover:bg-[#F4F8F7] hover:text-[#5A7D82]"><Users size={18}/></button>
                             <button onClick={shareLink} className="p-2 bg-[#D0E0E3] rounded-full text-[#5A7D82] hover:bg-[#84A59D] hover:text-white"><Share size={18}/></button>
                         </div>
                     </header>
                     <main className="flex-1 overflow-y-auto">
-                        {activeTab === 'info' && <InfoTab data={tripData} updateData={updateData} />}
+                        {activeTab === 'info' && <InfoTab data={tripData} updateData={updateData} showModal={showModal} />}
                         {activeTab === 'packing' && <PackingTab data={tripData} updateData={updateData} />}
-                        {activeTab === 'itinerary' && <ItineraryTab data={tripData} updateData={updateData} activeDayIdx={activeDayIdx} setActiveDayIdx={setActiveDayIdx} />}
+                        {activeTab === 'itinerary' && <ItineraryTab data={tripData} updateData={updateData} activeDayIdx={activeDayIdx} setActiveDayIdx={setActiveDayIdx} showModal={showModal} />}
                         {activeTab === 'expenses' && <ExpensesTab data={tripData} />}
                     </main>
                     <nav className="bg-white border-t border-[#F0F0F0] fixed bottom-0 left-0 right-0 max-w-md mx-auto pb-safe z-30">
