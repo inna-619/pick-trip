@@ -305,7 +305,7 @@
                                 onChange={e => updateData('info', { ...data.info, currencyCode: e.target.value })} />
                             <span className="text-sm">=</span>
                             <div className="relative">
-                                <input type="number" className="w-20 bg-white border border-[#D0D9DE] rounded px-1 text-center font-bold text-[#58707E]" 
+                                <input type="number" className="w-20 bg-white border border-[#D0D9DE] rounded px-1 text-center font-bold text-[#58707E] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                                     value={data.info.currencyRate} onChange={e => updateData('info', { ...data.info, currencyRate: e.target.value })} />
                                 {rateLoading && <div className="absolute inset-0 flex items-center justify-center bg-white/80"><Loader size={12} className="animate-spin text-[#6B8594]"/></div>}
                             </div>
@@ -314,7 +314,7 @@
                         <div className="flex items-center justify-between gap-4">
                             <div className="flex-1 bg-[#F4F7F8] rounded-lg p-3">
                                 <label className="block text-xs text-[#9DAAB0] mb-1">當地金額</label>
-                                <input type="number" className="w-full bg-transparent text-xl font-bold outline-none text-[#58707E]" value={amount} onChange={e => setAmount(e.target.value)} />
+                                <input type="number" className="w-full bg-transparent text-xl font-bold outline-none text-[#58707E] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={amount} onChange={e => setAmount(e.target.value)} />
                             </div>
                             <div className="text-[#9DAAB0]">≈</div>
                             <div className="flex-1 bg-[#E8F0F2] rounded-lg p-3">
@@ -482,53 +482,6 @@
                 const commonLabelClass = "text-xs text-[#9DAAB0] block mb-1";
                 const currentPayer = data.travelers.includes(item.payer) ? item.payer : data.travelers[0];
 
-                const CostBudgetBlock = () => (
-                    <div className="bg-white p-3 rounded border border-[#E0E0E0] mb-3">
-                        <div className="flex gap-3 mb-3">
-                            <div className="flex-1">
-                                <label className="text-xs text-[#9DAAB0] block mb-1">預算</label>
-                                <div className="relative">
-                                    <span className="absolute left-2 top-2 text-[#AAA]">$</span>
-                                    <input type="number" className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666]" value={item.budget || 0} onChange={e => handleUpdateItem(item.id, { budget: Number(e.target.value) })} />
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <label className="text-xs text-[#9DAAB0] block mb-1">實際支出</label>
-                                <div className="relative">
-                                    <span className="absolute left-2 top-2 text-[#AAA]">$</span>
-                                    <input type="number" className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666]" 
-                                        value={item.cost} 
-                                        onChange={e => { 
-                                            const val = Number(e.target.value); 
-                                            const updates = { cost: val }; 
-                                            if(item.isShared && item.sharedAmount == item.cost) { updates.sharedAmount = val; } 
-                                            handleUpdateItem(item.id, updates); 
-                                        }} 
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="text-xs text-[#9DAAB0] block mb-1">先墊付人</label>
-                            <select className="w-full p-2 rounded bg-[#F9F9F7] text-[#586666]" value={currentPayer} onChange={e=>handleUpdateItem(item.id, {payer: e.target.value})}>
-                                {data.travelers.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </div>
-                        <div className="flex items-center justify-between pt-2 border-t border-[#F0F0F0]">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" className="w-4 h-4 text-[#84A59D] rounded accent-[#84A59D]" checked={item.isShared} onChange={e => handleUpdateItem(item.id, { isShared: e.target.checked, sharedAmount: e.target.checked ? item.cost : 0 })} />
-                                <span className="text-sm font-medium text-[#777]">納入公費分帳</span>
-                            </label>
-                            {item.isShared && (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-[#9DAAB0]">公費金額:</span>
-                                    <input type="number" className="w-20 p-1 text-right border-b border-[#84A59D] text-[#5A7D82] font-bold outline-none" value={item.sharedAmount !== undefined ? item.sharedAmount : item.cost} onChange={e => handleUpdateItem(item.id, { sharedAmount: Number(e.target.value) })} />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                );
-
                 const fields = (() => {
                     switch(item.type) {
                         case 'transport':
@@ -576,7 +529,63 @@
                         <div className="grid grid-cols-2 gap-3">
                             {fields}
                         </div>
-                        <CostBudgetBlock /> 
+                        {/* 🟢 整合預算費用區塊 (修正輸入焦點問題) */}
+                        <div className="bg-white p-3 rounded border border-[#E0E0E0] mb-3">
+                            <div className="flex gap-3 mb-3">
+                                <div className="flex-1">
+                                    <label className="text-xs text-[#9DAAB0] block mb-1">預算</label>
+                                    <div className="relative">
+                                        <span className="absolute left-2 top-2 text-[#AAA]">$</span>
+                                        <input 
+                                            type="number" 
+                                            className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                            value={item.budget || ''} 
+                                            onChange={e => handleUpdateItem(item.id, { budget: Number(e.target.value) })} 
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-xs text-[#9DAAB0] block mb-1">實際支出</label>
+                                    <div className="relative">
+                                        <span className="absolute left-2 top-2 text-[#AAA]">$</span>
+                                        <input 
+                                            type="number" 
+                                            className="w-full pl-6 p-2 rounded bg-[#F9F9F7] font-bold text-[#586666] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                            value={item.cost || ''} 
+                                            onChange={e => { 
+                                                const val = Number(e.target.value); 
+                                                const updates = { cost: val }; 
+                                                if(item.isShared && item.sharedAmount == item.cost) { updates.sharedAmount = val; } 
+                                                handleUpdateItem(item.id, updates); 
+                                            }} 
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mb-3">
+                                <label className="text-xs text-[#9DAAB0] block mb-1">先墊付人</label>
+                                <select className="w-full p-2 rounded bg-[#F9F9F7] text-[#586666]" value={currentPayer} onChange={e=>handleUpdateItem(item.id, {payer: e.target.value})}>
+                                    {data.travelers.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="flex items-center justify-between pt-2 border-t border-[#F0F0F0]">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" className="w-4 h-4 text-[#84A59D] rounded accent-[#84A59D]" checked={item.isShared} onChange={e => handleUpdateItem(item.id, { isShared: e.target.checked, sharedAmount: e.target.checked ? item.cost : 0 })} />
+                                    <span className="text-sm font-medium text-[#777]">納入公費分帳</span>
+                                </label>
+                                {item.isShared && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-[#9DAAB0]">公費金額:</span>
+                                        <input 
+                                            type="number" 
+                                            className="w-20 p-1 text-right border-b border-[#84A59D] text-[#5A7D82] font-bold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                            value={item.sharedAmount !== undefined ? item.sharedAmount : (item.cost || '')} 
+                                            onChange={e => handleUpdateItem(item.id, { sharedAmount: Number(e.target.value) })} 
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 );
             };
